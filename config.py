@@ -1,0 +1,9 @@
+# Configuration Parameters
+CONFIG_PARAMS = {
+    'WORKER0_ADDRESS': '10.10.42.10',
+    'WORKER1_ADDRESS': '10.10.42.10',
+    'WORKER0_PORT': 8081,
+    'WORKER1_PORT': 8082,
+    'SERVER_MAX_CLIENTS': 50,
+    'EXIT_MESSAGE': 'exit'
+}
