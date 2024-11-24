@@ -14,11 +14,11 @@ def start_server() -> None:
     server_socket0.setsockopt(sk.SOL_SOCKET, sk.SO_REUSEADDR, 1)
     server_socket0.bind((IP_ADDRESS, PORT))
     server_socket0.listen(MAX_CLIENTS)
-    print("Server0 iniciado ")
+    print("Server1 conectado y escuchando")
 
     server_socket1 = sk.socket(sk.AF_INET,sk.SOCK_STREAM)
     server_socket1.connect((SERVER_IP_ADDRESS_WORKER1,PORT))
-    print("conectado a worker1")
+    print("Conectado a worker1")
 
     while True:
         client_socket, address = server_socket0.accept()

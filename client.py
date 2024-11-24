@@ -11,7 +11,7 @@ EXIT_MESSAGE = CONFIG_PARAMS['EXIT_MESSAGE']
 def receive_vector(client_socket: "sk.socket",nWork) -> None:
     try:
         while True:
-            vector= client_socket.recv(2048)
+            vector= client_socket.recv(32000000)
             if not vector:
                 break
             vector.decode('utf-8')
