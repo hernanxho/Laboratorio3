@@ -1,6 +1,8 @@
 import socket as sk
 import threading as th
 from config import CONFIG_PARAMS
+from typing import List,Dict
+import json as j
 
 SERVER_IP_ADDRESS_WORKER0 = CONFIG_PARAMS['SERVER_IP_ADDRESS_WORKER0']
 SERVER_IP_ADDRESS_WORKER1 = CONFIG_PARAMS['SERVER_IP_ADDRESS_WORKER1']
@@ -11,15 +13,16 @@ EXIT_MESSAGE = CONFIG_PARAMS['EXIT_MESSAGE']
 def receive_vector(client_socket: "sk.socket",nWork) -> None:
     try:
         while True:
-            vector= client_socket.recv(32000000)
-            if not vector:
+            task= client_socket.recv(32000000)
+            if not task:
                 break
-            vector.decode('utf-8')
+            task.decode('utf-8')
+            task_dict=j.loads(task)
             if(nWork==True):
                 print("El worker0 ha mandado este vector")
             else:
                 print("El worker1, ha mandado este vector")
-            for i in vector:
+            for i in task_dict["vector"]:
                 print("numero: "+str(i))
 
     except Exception as ex:
@@ -54,7 +57,9 @@ def start_client(vector,tiempo,tipo) -> None:
 
     try:
         task = {"vector": vector, "ordenamiento": tipo, "time_limit":tiempo}
-        client_socket0.sendall(bytes(task,'utf-8'))
+        # Convertir el diccionario a una cadena JSON
+        task_string = j.dumps(task)
+        client_socket0.sendall(bytes(task_string,'utf-8'))
     except Exception as ex:
         print(f"Erro de tipo: {ex}")
         client_socket0.close()
