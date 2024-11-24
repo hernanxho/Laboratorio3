@@ -48,5 +48,22 @@ def start_client() -> None:
     receive_thread1.daemon = True
     receive_thread1.start()
 
+<<<<<<< Updated upstream
 if __name__ == '__main__':
     start_client()
+=======
+    try:
+        task = {"vector": vector, "ordenamiento": tipo, "time_limit":tiempo, "estado": False, "ult_worker" : ""}  
+        client_socket0.sendall(bytes(task,'utf-8'))
+    except Exception as ex:
+        print(f"Erro de tipo: {ex}")
+        client_socket0.close()
+        client_socket1.close()
+
+
+    
+def cliente(vector,tiempo,tipo):
+    start_client(vector,tiempo,tipo)
+
+
+>>>>>>> Stashed changes
