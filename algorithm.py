@@ -11,8 +11,10 @@ def merge_sort_iterative(arr, time_limit, task_dict):
             merged = merge(left, right)
             arr[i:i + 2 * width] = merged
             if time.time() - start_time >= time_limit:
-                return arr
+                print("no alcanzó")
+                return arr, task_dict
         width *= 2
+    print ("si alcanzó")
     task_dict["estado"] = True
     return arr, task_dict
 
@@ -38,14 +40,17 @@ def heap_sort_iterative(arr, time_limit, task_dict):
     for i in range(n // 2 - 1, -1, -1):
         heapify(arr, n, i)
         if time.time() - start_time >= time_limit:
-            return arr
+            print("no alcanzó")
+            return arr, task_dict
     
     # Extract elements one by one
     for i in range(n - 1, 0, -1):
         arr[i], arr[0] = arr[0], arr[i]  # Swap
         heapify(arr, i, 0)
         if time.time() - start_time >= time_limit:
-            return arr
+            print("no alcanzó")                            
+            return arr, task_dict
+    print("si alcanzó")
     task_dict["estado"] = True
     return arr, task_dict
 
@@ -75,7 +80,9 @@ def quick_sort_iterative(arr, time_limit, task_dict):
             stack.append((low, p - 1))
             stack.append((p + 1, high))
         if time.time() - start_time >= time_limit:
-            return arr
+            print("no alcanzó")
+            return arr, task_dict
+    print("si alcanzó")
     task_dict["estado"] = True
     return arr, task_dict
 

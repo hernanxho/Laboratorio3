@@ -22,17 +22,23 @@ def recibir_vector(socket_1: "sk.socket", address: "sk._RetAddress", socket_2: "
         task_dict = j.loads(task)
 
         if task_dict["ordenamiento"] == "mergesort":
-            task_dict["vector"], task_dict = alg.merge_sort_iterative(task_dict["vector"], int(task_dict["time_limit"]), task_dict)
+            task_dict["vector"], task_dict = alg.merge_sort_iterative(task_dict["vector"], float(task_dict["time_limit"]), task_dict)
         elif task_dict["ordenamiento"] == "quicksort":
-            task_dict["vector"], task_dict = alg.quick_sort_iterative(task_dict["vector"], int(task_dict["time_limit"]), task_dict)
+            task_dict["vector"], task_dict = alg.quick_sort_iterative(task_dict["vector"], float(task_dict["time_limit"]), task_dict)
         elif task_dict["ordenamiento"] == "heapsort":
-            task_dict["vector"], task_dict = alg.heap_sort_iterative(task_dict["vector"], int(task_dict["time_limit"]), task_dict)
+            task_dict["vector"], task_dict = alg.heap_sort_iterative(task_dict["vector"], float(task_dict["time_limit"]), task_dict)
+
+        task_dict["ult_worker"] = IP_ADDRESS
 
         for i in task_dict["vector"]:
             print("Numero recibido: " + str(i))
         print("Tiempo: " + str(task_dict["time_limit"]))
         print("Ordenamiento: " + str(task_dict["ordenamiento"]))
+        print(f"Ultimo worker: {task_dict['ult_worker']}")
+
+        task = j.dumps(task_dict)
         task = bytes(task, 'utf-8')
+
 
         if orden:
             if task_dict["estado"]:
