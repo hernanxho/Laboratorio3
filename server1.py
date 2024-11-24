@@ -35,7 +35,12 @@ def start_server() -> None:
     print("server1 conectado y escuchando")
 
     while True:
+        
         client_socket, address = server_socket1.accept()
+        client_thread = th.Thread(target = recibir_vector,args=(client_socket,address))
+        client_thread.daemon = True
+        client_thread.start()
+        
         if client_socket:
             if client_socket not in LIST_OF_CLIENTS:
                 LIST_OF_CLIENTS.append(client_socket)
