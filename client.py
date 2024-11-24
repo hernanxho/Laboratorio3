@@ -2,6 +2,7 @@ import socket as sk
 import threading as th
 from config import CONFIG_PARAMS
 from typing import List, Dict
+import json as j
 
 SERVER_IP_ADDRESS_WORKER0 = CONFIG_PARAMS['SERVER_IP_ADDRESS_WORKER0']
 SERVER_IP_ADDRESS_WORKER1 = CONFIG_PARAMS['SERVER_IP_ADDRESS_WORKER1']
@@ -20,13 +21,8 @@ def receive_vector(client_socket: "sk.socket",nWork) -> None:
                 print("El worker0 ha mandado este vector")
             else:
                 print("El worker1, ha mandado este vector")
-<<<<<<< Updated upstream
-            for i in vector:
-                print("\n"+vector[i])
-=======
             for i in task["vector"]:
                 print("numero: "+str(i))
->>>>>>> Stashed changes
 
     except Exception as ex:
         print(f'Error recibiendo el vector: {ex}')
@@ -54,5 +50,3 @@ def start_client() -> None:
 
 if __name__ == '__main__':
     start_client()
-
-
