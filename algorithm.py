@@ -1,4 +1,7 @@
-def merge_sort_iterative(arr):
+import time
+
+def merge_sort_iterative(arr, time_limit, task_dict):
+    start_time = time.time()
     width = 1
     n = len(arr)
     while width < n:
@@ -7,8 +10,11 @@ def merge_sort_iterative(arr):
             right = arr[i + width:i + 2 * width]
             merged = merge(left, right)
             arr[i:i + 2 * width] = merged
+            if time.time() - start_time >= time_limit:
+                return arr
         width *= 2
-    return arr
+    task_dict["estado"] = True
+    return arr, task_dict
 
 def merge(left, right):
     result = []
@@ -24,18 +30,24 @@ def merge(left, right):
     result.extend(right[j:])
     return result
 
-def heap_sort_iterative(arr):
+def heap_sort_iterative(arr, time_limit, task_dict):
+    start_time = time.time()
     n = len(arr)
     
     # Build a maxheap
     for i in range(n // 2 - 1, -1, -1):
         heapify(arr, n, i)
+        if time.time() - start_time >= time_limit:
+            return arr
     
     # Extract elements one by one
     for i in range(n - 1, 0, -1):
         arr[i], arr[0] = arr[0], arr[i]  # Swap
         heapify(arr, i, 0)
-    return arr
+        if time.time() - start_time >= time_limit:
+            return arr
+    task_dict["estado"] = True
+    return arr, task_dict
 
 def heapify(arr, n, i):
     largest = i
@@ -52,7 +64,8 @@ def heapify(arr, n, i):
         arr[i], arr[largest] = arr[largest], arr[i]
         heapify(arr, n, largest)
 
-def quick_sort_iterative(arr):
+def quick_sort_iterative(arr, time_limit, task_dict):
+    start_time = time.time()
     stack = [(0, len(arr) - 1)]
     
     while stack:
@@ -61,7 +74,10 @@ def quick_sort_iterative(arr):
             p = partition(arr, low, high)
             stack.append((low, p - 1))
             stack.append((p + 1, high))
-    return arr
+        if time.time() - start_time >= time_limit:
+            return arr
+    task_dict["estado"] = True
+    return arr, task_dict
 
 def partition(arr, low, high):
     pivot = arr[high]

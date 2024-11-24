@@ -53,7 +53,7 @@ def start_client(vector,tiempo,tipo) -> None:
     receive_thread1.start()
 
     try:
-        task = {"vector": vector, "ordenamiento": tipo, "time_limit":tiempo}
+        task = {"vector": vector, "ordenamiento": tipo, "time_limit":tiempo, "estado": False}  
         client_socket0.sendall(bytes(task,'utf-8'))
     except Exception as ex:
         print(f"Erro de tipo: {ex}")
