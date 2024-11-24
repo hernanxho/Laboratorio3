@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinterdnd2 import DND_FILES, TkinterDnD
+import client as c
 
+vector =[]
 class guiClass :
     
     def __init__(self):
@@ -22,13 +24,13 @@ class guiClass :
         self.opcionesFrame = tk.Frame(self.gui, bg="#FFFAF0", highlightbackground="black", highlightthickness=2)
         self.opcionesFrame.pack(fill=tk.BOTH, expand=True)
 
-        self.mergeButton = tk.Button(self.opcionesFrame,text="Mergesort",font=("Arial", 16))
+        self.mergeButton = tk.Button(self.opcionesFrame,text="Mergesort",font=("Arial", 16), command= lambda: c.cliente(vector,self.tiempoBarra.get(),"mergesort"))
         self.mergeButton.place(x=150,y=600,height=70,width=220)
 
-        self.heapButton = tk.Button(self.opcionesFrame,text="Heapsort",font=("Arial", 16))
+        self.heapButton = tk.Button(self.opcionesFrame,text="Heapsort",font=("Arial", 16), command= lambda: c.cliente(vector,self.tiempoBarra.get(),"heapsort"))
         self.heapButton.place(x=470,y=600,height=70,width=220)
 
-        self.quickButton = tk.Button(self.opcionesFrame,text="Quicksort",font=("Arial", 16))
+        self.quickButton = tk.Button(self.opcionesFrame,text="Quicksort",font=("Arial", 16), command= lambda: c.cliente(vector,self.tiempoBarra.get(),"quicksort"))
         self.quickButton.place(x=790,y=600,height=70,width=220)
 
         self.drop_area = tk.Label(self.opcionesFrame,text="Arrastra aquí un archivo .txt",bg="#d9d9d9",relief="ridge",font=("Arial", 14))
@@ -46,6 +48,7 @@ class guiClass :
 
         self.gui.mainloop()
 
+
     def handle_drop(self, event):
         # Obtiene la ruta del archivo que va a ser soltado
         file_path = event.data.strip().strip('{}')
@@ -59,13 +62,24 @@ class guiClass :
                     #lee las lineas de texto
                     for line in file:    
                         # Muestra el contenido del archivo
-                        print(f"Contenido del archivo:"+line)
+                        #print(f"Contenido del archivo:"+line)
+
+                        #limpia la linea y elimina espacios 
+                        clean_line = line.strip()
+
+                        #Hace un filtro para solo extraer los numeros
+                        numero = ''.join(char for char in clean_line if char.isdigit())
+
+                        vector.append(int(numero))
+                #for i in vector:
+                    #print("\nNumero del vector: " +str(i))
 
             except Exception as e:
                 print("No fue posible leer el archivo"+e)
 
         else:
             print("El archivo no es de tipo txt, intenta de nuevo")
+
 
 
 guiClass()
