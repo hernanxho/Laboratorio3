@@ -1,6 +1,7 @@
 import socket as sk
 import threading as th
 from config import CONFIG_PARAMS
+from typing import List, Dict
 
 SERVER_IP_ADDRESS_WORKER0 = CONFIG_PARAMS['SERVER_IP_ADDRESS_WORKER0']
 SERVER_IP_ADDRESS_WORKER1 = CONFIG_PARAMS['SERVER_IP_ADDRESS_WORKER1']
@@ -11,19 +12,24 @@ EXIT_MESSAGE = CONFIG_PARAMS['EXIT_MESSAGE']
 def receive_vector(client_socket: "sk.socket",nWork) -> None:
     try:
         while True:
-            vector= client_socket.recv(32000000)
-            if not vector:
+            task: Dict = client_socket.recv(32000000)
+            if not task:
                 break
-            vector.decode('utf-8')
+            task.decode('utf-8')
             if(nWork==True):
                 print("El worker0 ha mandado este vector")
             else:
                 print("El worker1, ha mandado este vector")
+<<<<<<< Updated upstream
             for i in vector:
                 print("\n"+vector[i])
+=======
+            for i in task["vector"]:
+                print("numero: "+str(i))
+>>>>>>> Stashed changes
 
     except Exception as ex:
-        print(f'Error receiving the vector: {ex}')
+        print(f'Error recibiendo el vector: {ex}')
     finally:
         client_socket.close()
 

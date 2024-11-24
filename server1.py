@@ -1,7 +1,8 @@
 import socket as sk
 import threading as th
 from config import CONFIG_PARAMS
-from typing import List
+from typing import List, Dict
+import json as j
 
 IP_ADDRESS = CONFIG_PARAMS['SERVER_IP_ADDRESS_WORKER1']
 SERVER_IP_ADDRESS_WORKER0 = CONFIG_PARAMS['SERVER_IP_ADDRESS_WORKER0']
@@ -9,6 +10,27 @@ PORT = CONFIG_PARAMS['SERVER_PORT']
 MAX_CLIENTS = CONFIG_PARAMS['SERVER_MAX_CLIENTS']
 LIST_OF_CLIENTS : list["sk.socket"] = []
 
+<<<<<<< Updated upstream
+=======
+def recibir_vector(client_socket: "sk.socket",address:"sk._RetAddress") -> None:
+        try:
+
+            task: Dict = client_socket.recv(32000000)
+            task = task.decode('utf-8')
+            print("Tarea recibida")
+
+            for i in task["vector"]:
+                 print("Numero recibido: "+str(i))
+            print("Tiempo: "+str(task("time_limit")))
+            print("Ordenamiento:" +task("ordenamiento"))    
+
+            task = bytes(task,'utf-8')
+            client_socket.sendall(task)  
+        except Exception as ex:
+            print(f"Error de tipo: {ex}")
+
+
+>>>>>>> Stashed changes
 def start_server() -> None:
     server_socket1 = sk.socket(sk.AF_INET, sk.SOCK_STREAM)
     server_socket1.setsockopt(sk.SOL_SOCKET, sk.SO_REUSEADDR, 1)
