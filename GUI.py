@@ -5,7 +5,7 @@ import client as c
 vector =[]
 class guiClass :
     
-    def __init__(self):
+    def _init_(self):
         
         self.gui = TkinterDnD.Tk()
         self.gui.geometry("1500x760")
