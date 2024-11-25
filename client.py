@@ -1,68 +1,58 @@
-import socket as sk
-import threading as th
+import socket
+import pickle
 from config import CONFIG_PARAMS
 
-SERVER_IP_ADDRESS_WORKER0 = CONFIG_PARAMS['SERVER_IP_ADDRESS_WORKER0']
-SERVER_IP_ADDRESS_WORKER1 = CONFIG_PARAMS['SERVER_IP_ADDRESS_WORKER1']
+# Configuración del cliente
+SERVER_IP_ADDRESS = CONFIG_PARAMS['SERVER_IP_ADDRESS_WORKER0']    
 SERVER_PORT = CONFIG_PARAMS['SERVER_PORT']
-EXIT_MESSAGE = CONFIG_PARAMS['EXIT_MESSAGE']
+
+def enviar_task(socket, task):
+    serialized_task = pickle.dumps(task)
+    length = len(serialized_task)
+    socket.sendall(length.to_bytes(4, byteorder='big'))  # Enviar el tamaño
+    socket.sendall(serialized_task)  # Enviar los datos
+
+def recibir_task(socket):
+    length = int.from_bytes(socket.recv(4), byteorder='big')
+    task = b''
+    while len(task) < length:
+        packet = socket.recv(length - len(task))
+        if not packet:
+            raise Exception("Error: socket connection broken")
+        task += packet
+    return pickle.loads(task)
 
 
-def receive_vector(client_socket: "sk.socket",nWork) -> None:
+def start_client(vector, tiempo, tipo):
+    """Inicia el cliente y se conecta al servidor."""
     try:
-        while True:
-            vector= client_socket.recv(32000000)
-            if not vector:
-                break
-            vector.decode('utf-8')
-            if(nWork==True):
-                print("El worker0 ha mandado este vector")
-            else:
-                print("El worker1, ha mandado este vector")
-            for i in vector:
-                print("numero: "+str(i))
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_socket.connect((SERVER_IP_ADDRESS, SERVER_PORT))
+        print("Conectado al servidor principal (worker_0).")
 
-    except Exception as ex:
-        print(f'Error receiving the vector: {ex}')
+            
+
+        task = {
+                "algorithm": tipo,
+                "vector": vector,
+                "time_limit": float(tiempo)
+            }
+        enviar_task(client_socket, task)
+        print("Esperando respuesta del servidor...")
+        task_recibida = recibir_task(client_socket)
+        guardar(task_recibida["sorted_vector"], 'ordenado.txt')
+        print(f"Vector ordenado recibido y guardado en -{'ordenado.txt'}-.")
+        print(f"Tiempo total: {task_recibida['time_taken']} segundos")
+
+    except Exception as e:
+        print(f"Error inesperado: {e}")
     finally:
         client_socket.close()
 
-def start_client(vector,tiempo,tipo) -> None:
-    
-    print("Cliente ejecutado")
-    for i in vector:
-        print("\nNumero: "+str(i))
-    print("Tiempo en segundos"+tiempo)
-    print("ordenamiento "+tipo)
+def guardar(lista, nombre_archivo):
+    with open(nombre_archivo, 'w') as archivo:
+        for numero in lista:
+            archivo.write(f"{numero}\n")
 
-    #Objeto de tipo cliente socket, que se utilizara para establecer la conexcion y enviar o recibir datos 
-    client_socket0 = sk.socket(sk.AF_INET,sk.SOCK_STREAM)
-    client_socket0.connect((SERVER_IP_ADDRESS_WORKER0,SERVER_PORT))
-    print("conectado a worker0")
-    
-    client_socket1 = sk.socket(sk.AF_INET,sk.SOCK_STREAM)
-    client_socket1.connect((SERVER_IP_ADDRESS_WORKER1,SERVER_PORT))
-    print("conectado a worker1")
-
-    receive_thread0 = th.Thread(target=receive_vector, args=(client_socket0,True))
-    receive_thread0.daemon = True
-    receive_thread0.start()
-
-    receive_thread1 = th.Thread(target=receive_vector, args=(client_socket1,False))
-    receive_thread1.daemon = True
-    receive_thread1.start()
-
-    try:
-        task = {"vector": vector, "ordenamiento": tipo, "time_limit":tiempo, "estado": False}  
-        client_socket0.sendall(bytes(task,'utf-8'))
-    except Exception as ex:
-        print(f"Erro de tipo: {ex}")
-        client_socket0.close()
-        client_socket1.close()
-
-
-    
-def cliente(vector,tiempo,tipo):
-    start_client(vector,tiempo,tipo)
 
 

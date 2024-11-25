@@ -1,83 +1,87 @@
-import socket as sk
-import threading as th
+import socket
+import pickle
+import time
+from algorithms import heapsort, quicksort, mergesort
 from config import CONFIG_PARAMS
-from typing import List
-import algorithm as alg
-import json as j
 
-IP_ADDRESS = CONFIG_PARAMS['SERVER_IP_ADDRESS_WORKER1']
-SERVER_IP_ADDRESS_WORKER0 = CONFIG_PARAMS['SERVER_IP_ADDRESS_WORKER0']
+IP_ADDRESS = CONFIG_PARAMS['SERVER_IP_ADDRESS_WORKER1']  
 PORT = CONFIG_PARAMS['SERVER_PORT']
-MAX_CLIENTS = CONFIG_PARAMS['SERVER_MAX_CLIENTS']
-LIST_OF_CLIENTS : list["sk.socket"] = []
+WORKER_0_IP = CONFIG_PARAMS['SERVER_IP_ADDRESS_WORKER0']
+
+def enviar_task(socket, data):
+    serialized_data = pickle.dumps(data)
+    length = len(serialized_data)
+    socket.sendall(length.to_bytes(4, byteorder='big'))
+    socket.sendall(serialized_data)
+
+def recibir_task(socket):
+    length = int.from_bytes(socket.recv(4), byteorder='big')
+    task = b''
+    while len(task) < length:
+        paquete = socket.recv(length - len(task))
+        if not paquete:
+            raise Exception("Error: socket connection broken")
+        task += paquete
+    return pickle.loads(task)
+
+def is_sorted(vector):
+    return all(vector[i] <= vector[i + 1] for i in range(len(vector) - 1))
 
 
-
-def recibir_vector(socket_1: "sk.socket", address: "sk._RetAddress", socket_2: "sk.socket", orden) -> None:
+def handle_worker0(worker0_socket):
     try:
-        task = socket_1.recv(32000000)
-        task = task.decode('utf-8')
-        print("Tarea recibida")
+        print("WORKER 0 ESTA ENVIANDO DATOS ")
+        task = recibir_task(worker0_socket)
+        vector = task["vector"]
+        algorithm = task["algorithm"]
+        user_time_limit = task["time_limit"]
+        extra = task["extra"]
 
-        # Parse the JSON string into a dictionary
-        task_dict = j.loads(task)
+        # Validación inicial
+        if is_sorted(vector):
+            enviar_task(worker0_socket, {"vector": vector, "completed": True})
+            return
 
-        if task_dict["ordenamiento"] == "mergesort":
-            task_dict["vector"], task_dict = alg.merge_sort_iterative(task_dict["vector"], int(task_dict["time_limit"]), task_dict)
-        elif task_dict["ordenamiento"] == "quicksort":
-            task_dict["vector"], task_dict = alg.quick_sort_iterative(task_dict["vector"], int(task_dict["time_limit"]), task_dict)
-        elif task_dict["ordenamiento"] == "heapsort":
-            task_dict["vector"], task_dict = alg.heap_sort_iterative(task_dict["vector"], int(task_dict["time_limit"]), task_dict)
+        
+        start_time = time.time()
+        end_time = start_time + user_time_limit
 
-        for i in task_dict["vector"]:
-            print("Numero recibido: " + str(i))
-        print("Tiempo: " + str(task_dict["time_limit"]))
-        print("Ordenamiento: " + str(task_dict["ordenamiento"]))
-        task = bytes(task, 'utf-8')
+        while not is_sorted(vector):
+            if algorithm == 1:
+                print("Comenzando a ordenar con MERGESORT")
+                extra = mergesort(vector, end_time, extra)
+            elif algorithm == 2:
+                print("Comenzando a ordenar con QUICKSORT")
+                extra = quicksort(vector, end_time, extra)
+            elif algorithm == 3:
+                print("Comenzando a ordenar con HEAPSORT")
+                extra = heapsort(vector, end_time, extra[1])
 
-        if orden:
-            if task_dict["estado"]:
-                socket_1.sendall(task)
-            else:
-                socket_2.sendall(task)
-        else:
-            if task_dict["estado"]:
-                socket_2.sendall(task)
-            else:
-                socket_1.sendall(task)
+            if is_sorted(vector):
+                print("Worker_1: VECTOR ORDENADO.")
+                enviar_task(worker0_socket, {"vector": vector, "extra": extra, "completed": True})
+                return 
 
-    except Exception as ex:
-        print(f"Error de tipo: {ex}")
+            if time.time() >= end_time:
+                print("Worker_1: TIEMPO AGOTADO. Devolviendo vector a Worker_0")
+                enviar_task(worker0_socket, {"vector": vector, "extra": extra,  "completed": False})
+                return 
 
-def start_server() -> None:
-    
-    server_socket1 = sk.socket(sk.AF_INET, sk.SOCK_STREAM)
-    server_socket1.setsockopt(sk.SOL_SOCKET, sk.SO_REUSEADDR, 1)
-    server_socket1.bind((IP_ADDRESS, PORT))
-    server_socket1.listen(MAX_CLIENTS)
-    print("server1 conectado y escuchando")
+    except Exception as e:
+        print(f"Error en Worker_1: {e}")
+    finally:
+        worker0_socket.close()
 
-    server_socket0 = sk.socket(sk.AF_INET, sk.SOCK_STREAM)
-    server_socket0.connect((SERVER_IP_ADDRESS_WORKER0, PORT))
-
+def start_worker1():
+    print(f"Worker_1 escuchando en {IP_ADDRESS}:{PORT}")
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind((IP_ADDRESS, PORT))
+    server_socket.listen(5)
 
     while True:
-        
-        client_socket, address = server_socket0.accept()
-        client_thread = th.Thread(target = recibir_vector, args = (client_socket, address, server_socket0, True))
-        client_thread.daemon = True
-        client_thread.start()
+        worker0_socket, _ = server_socket.accept()
+        print("Worker_1: Conexión establecida.")
+        handle_worker0(worker0_socket)
 
-        server0_thread = th.Thread(target = recibir_vector, args = (server_socket0, address, client_socket, False))
-        server0_thread.daemon = True
-        server0_thread.start()
-
-
-        if client_socket:
-            if client_socket not in LIST_OF_CLIENTS:
-                LIST_OF_CLIENTS.append(client_socket)
-            print(f"Clientes conectados a {address}")      
-
-
-if __name__ == '__main__':
-    start_server()
+if __name__ == "__main__":
+    start_worker1()
