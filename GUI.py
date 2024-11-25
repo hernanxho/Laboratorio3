@@ -24,13 +24,13 @@ class guiClass :
         self.opcionesFrame = tk.Frame(self.gui, bg="#FFFAF0", highlightbackground="black", highlightthickness=2)
         self.opcionesFrame.pack(fill=tk.BOTH, expand=True)
 
-        self.mergeButton = tk.Button(self.opcionesFrame,text="Mergesort",font=("Arial", 16), command= lambda: c.cliente(vector,self.tiempoBarra.get(),"mergesort"))
+        self.mergeButton = tk.Button(self.opcionesFrame,text="Mergesort",font=("Arial", 16), command= lambda: c.start_client(vector,self.tiempoBarra.get(),1))
         self.mergeButton.place(x=150,y=600,height=70,width=220)
 
-        self.heapButton = tk.Button(self.opcionesFrame,text="Heapsort",font=("Arial", 16), command= lambda: c.cliente(vector,self.tiempoBarra.get(),"heapsort"))
+        self.heapButton = tk.Button(self.opcionesFrame,text="Heapsort",font=("Arial", 16), command= lambda: c.start_client(vector,self.tiempoBarra.get(),3))
         self.heapButton.place(x=470,y=600,height=70,width=220)
 
-        self.quickButton = tk.Button(self.opcionesFrame,text="Quicksort",font=("Arial", 16), command= lambda: c.cliente(vector,self.tiempoBarra.get(),"quicksort"))
+        self.quickButton = tk.Button(self.opcionesFrame,text="Quicksort",font=("Arial", 16), command= lambda: c.start_client(vector,    self.tiempoBarra.get(),2))
         self.quickButton.place(x=790,y=600,height=70,width=220)
 
         self.drop_area = tk.Label(self.opcionesFrame,text="Arrastra aquí un archivo .txt",bg="#d9d9d9",relief="ridge",font=("Arial", 14))
