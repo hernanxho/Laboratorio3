@@ -10,12 +10,16 @@ def merge_sort_iterative(arr, time_limit, task_dict):
             right = arr[i + width:i + 2 * width]
             merged = merge(left, right)
             arr[i:i + 2 * width] = merged
+            
+            # Verificar si se ha alcanzado el tiempo límite
             if time.time() - start_time >= time_limit:
-                print("no alcanzó")
-                return arr, task_dict
+                print("No alcanzó el tiempo límite")
+                task_dict["estado"] = False  # Indicar que no se completó
+                return arr, task_dict  # Devolver el arreglo parcial y el estado
         width *= 2
-    print ("si alcanzó")
-    task_dict["estado"] = True
+
+    print("Ordenamiento completado dentro del tiempo")
+    task_dict["estado"] = True  # El trabajo está completo
     return arr, task_dict
 
 def merge(left, right):
@@ -36,22 +40,27 @@ def heap_sort_iterative(arr, time_limit, task_dict):
     start_time = time.time()
     n = len(arr)
     
-    # Build a maxheap
+    # Construir el maxheap
     for i in range(n // 2 - 1, -1, -1):
         heapify(arr, n, i)
+        # Verificar si se ha alcanzado el tiempo límite
         if time.time() - start_time >= time_limit:
-            print("no alcanzó")
+            print("No alcanzó el tiempo límite")
+            task_dict["estado"] = False  # Indicar que no se completó
             return arr, task_dict
     
-    # Extract elements one by one
+    # Extraer elementos uno por uno
     for i in range(n - 1, 0, -1):
-        arr[i], arr[0] = arr[0], arr[i]  # Swap
+        arr[i], arr[0] = arr[0], arr[i]  # Intercambiar
         heapify(arr, i, 0)
+        # Verificar si se ha alcanzado el tiempo límite
         if time.time() - start_time >= time_limit:
-            print("no alcanzó")                            
+            print("No alcanzó el tiempo límite")
+            task_dict["estado"] = False  # Indicar que no se completó
             return arr, task_dict
-    print("si alcanzó")
-    task_dict["estado"] = True
+
+    print("Ordenamiento completado dentro del tiempo")
+    task_dict["estado"] = True  # El trabajo está completo
     return arr, task_dict
 
 def heapify(arr, n, i):
@@ -79,11 +88,15 @@ def quick_sort_iterative(arr, time_limit, task_dict):
             p = partition(arr, low, high)
             stack.append((low, p - 1))
             stack.append((p + 1, high))
+        
+        # Verificar si se ha alcanzado el tiempo límite
         if time.time() - start_time >= time_limit:
-            print("no alcanzó")
+            print("No alcanzó el tiempo límite")
+            task_dict["estado"] = False  # Indicar que no se completó
             return arr, task_dict
-    print("si alcanzó")
-    task_dict["estado"] = True
+
+    print("Ordenamiento completado dentro del tiempo")
+    task_dict["estado"] = True  # El trabajo está completo
     return arr, task_dict
 
 def partition(arr, low, high):

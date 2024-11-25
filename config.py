@@ -4,5 +4,4 @@ CONFIG_PARAMS ={
     'SERVER_PORT' : 8888,
     'SERVER_MAX_CLIENTS' : 3,
     'EXIT_MESSAGE' : 'exit'
-
 }

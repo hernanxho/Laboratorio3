@@ -13,13 +13,17 @@ MAX_CLIENTS = CONFIG_PARAMS['SERVER_MAX_CLIENTS']
 LIST_OF_CLIENTS : List["sk.socket"] = []
 
 def recibir_vector(socket_1: "sk.socket", address: "sk._RetAddress", socket_2: "sk.socket", orden) -> None:
-    try:
+    #try:
         task = socket_1.recv(32000000)
+        if not task:
+            return
         task = task.decode('utf-8')
-        print("Tarea recibida")
+        print("Tarea recibida") 
 
         # Parse the JSON string into a dictionary
+        #try:
         task_dict = j.loads(task)
+        
 
         if task_dict["ordenamiento"] == "mergesort":
             task_dict["vector"], task_dict = alg.merge_sort_iterative(task_dict["vector"], float(task_dict["time_limit"]), task_dict)
@@ -29,16 +33,17 @@ def recibir_vector(socket_1: "sk.socket", address: "sk._RetAddress", socket_2: "
             task_dict["vector"], task_dict = alg.heap_sort_iterative(task_dict["vector"], float(task_dict["time_limit"]), task_dict)
 
         task_dict["ult_worker"] = IP_ADDRESS
+        task_dict["rebotes"] += 1
 
-        for i in task_dict["vector"]:
-            print("Numero recibido: " + str(i))
         print("Tiempo: " + str(task_dict["time_limit"]))
+        print(f"Cantidad de elementos: {len(task_dict['vector'])}")
         print("Ordenamiento: " + str(task_dict["ordenamiento"]))
-        print(f"Ultimo worker: {task_dict['ult_worker']}")
+        print(f"Rebotes: {task_dict['rebotes']}")
+        print(f"Estado del ordenamiento: {task_dict['estado']}")
+        print(f"Último worker: {task_dict['ult_worker']}")
 
         task = j.dumps(task_dict)
         task = bytes(task, 'utf-8')
-
 
         if orden:
             if task_dict["estado"]:
@@ -51,8 +56,8 @@ def recibir_vector(socket_1: "sk.socket", address: "sk._RetAddress", socket_2: "
             else:
                 socket_1.sendall(task)
 
-    except Exception as ex:
-        print(f"Error de tipo: {ex}")
+    #except Exception as ex:
+        #print(f"Error de tipo: {ex}")
 
 
 def start_server() -> None:

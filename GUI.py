@@ -5,7 +5,7 @@ import client as c
 vector =[]
 class guiClass :
     
-    def __init__(self):
+    def _init_(self):
         
         self.gui = TkinterDnD.Tk()
         self.gui.geometry("1500x760")
@@ -68,9 +68,8 @@ class guiClass :
                         clean_line = line.strip()
 
                         #Hace un filtro para solo extraer los numeros
-                        numero = ''.join(char for char in clean_line if char.isdigit())
-
-                        vector.append(int(numero))
+                        if(line!=""):
+                            vector.append(int(clean_line))
                 #for i in vector:
                     #print("\nNumero del vector: " +str(i))
 
